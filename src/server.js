@@ -13,9 +13,23 @@ import http from 'node:http'
 
 const users = []
 
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
 
     const { method, url } = req
+
+    const buffers = []
+ 
+    for await (const chunk of req) {
+        buffers.push(chunk)
+    }
+    // tranformando em uma estrutura legivel
+    try {
+        req.body = JSON.parse(Buffer.concat(buffers).toString())
+    } catch {
+        req.body = null
+    }
+
+    console.log(req.body)
     console.log(method,url)
 
     if (method === 'GET' && url === '/users') {
@@ -26,11 +40,14 @@ const server = http.createServer((req, res) => {
     }
 
     if (method === 'POST' && url === '/users') {
+        const { nome, email } = req.body
+
         users.push({
             id: 1,
-            nome: 'igor',
-            email: 'igor08@gmail.com'
+            nome,
+            email,
         })
+
         return res.writeHead(201).end('Usuario Criado')
     }
 
