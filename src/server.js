@@ -2,6 +2,8 @@
 // const http = require('http')
 // Novo Padrao => ESModules => import/export  
 import http from 'node:http'
+import { json } from './middlewares/json.js'
+import { Database } from './database.js'
 
 // criando uma constante para cria o servidor
 // req = request => obtendo acesso as informacoes da requisicao ao server
@@ -11,42 +13,31 @@ import http from 'node:http'
 
 // Cabelhacos (requisicao/resposta) => Metadados
 
-const users = []
+const database = new Database()
 
 const server = http.createServer(async (req, res) => {
 
     const { method, url } = req
 
-    const buffers = []
- 
-    for await (const chunk of req) {
-        buffers.push(chunk)
-    }
-    // tranformando em uma estrutura legivel
-    try {
-        req.body = JSON.parse(Buffer.concat(buffers).toString())
-    } catch {
-        req.body = null
-    }
-
-    console.log(req.body)
-    console.log(method,url)
+    await json(req,res)
 
     if (method === 'GET' && url === '/users') {
+        const users = database.select('users')
         // Early return
-        return res
-        .setHeader('Content-type', 'application/json')
-        .end(JSON.stringify(users))
+        return res.end(JSON.stringify(users))
+        // .setHeader('Content-type', 'application/json')
     }
 
     if (method === 'POST' && url === '/users') {
         const { nome, email } = req.body
 
-        users.push({
+        const user = {
             id: 1,
             nome,
             email,
-        })
+        }
+
+        database.insert('users', user)
 
         return res.writeHead(201).end('Usuario Criado')
     }
