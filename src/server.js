@@ -3,7 +3,7 @@
 // Novo Padrao => ESModules => import/export  
 import http from 'node:http'
 import { json } from './middlewares/json.js'
-import { Database } from './database.js'
+import { routes } from './routes.js'
 
 // criando uma constante para cria o servidor
 // req = request => obtendo acesso as informacoes da requisicao ao server
@@ -13,7 +13,14 @@ import { Database } from './database.js'
 
 // Cabelhacos (requisicao/resposta) => Metadados
 
-const database = new Database()
+// Query Parameters: Url Stateful => filtros, paginacao, não-obrigatorios 
+// Ex:. http://localhost:3333/users?userId=1&nome=Diego
+
+// Route Parameters: Identificção de recurso
+// Ex:. GET http://localhost:3333/users/1
+
+// Request Body: Envio de Informações como um formulário (HTTPs)
+// Ex:. enviado como Json ou Xml
 
 const server = http.createServer(async (req, res) => {
 
@@ -21,25 +28,14 @@ const server = http.createServer(async (req, res) => {
 
     await json(req,res)
 
-    if (method === 'GET' && url === '/users') {
-        const users = database.select('users')
-        // Early return
-        return res.end(JSON.stringify(users))
-        // .setHeader('Content-type', 'application/json')
-    }
+    const route = routes.find(route => {
+        return route.method === method && route.path === url
+    })
 
-    if (method === 'POST' && url === '/users') {
-        const { nome, email } = req.body
+    // console.log(route)
 
-        const user = {
-            id: 1,
-            nome,
-            email,
-        }
-
-        database.insert('users', user)
-
-        return res.writeHead(201).end('Usuario Criado')
+    if(route) {
+        return route.handler(req,res)
     }
 
     return res.writeHead(404).end('Not Found')

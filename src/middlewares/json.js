@@ -1,3 +1,5 @@
+
+// criando uma funcao assicrona para a estrutura de requisicao e resposta do json na aplicacao
 export async function json(req, res) {
     const buffers = []
  
