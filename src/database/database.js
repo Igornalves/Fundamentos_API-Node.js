@@ -51,4 +51,14 @@ export class Database {
             this.#persist()
         }
     }
+
+    update(table, id, data) {
+        const rowIntex = this.#database[table].findIndex(row => row.id === id)
+
+        if (rowIntex > -1) {
+            this.#database[table][rowIntex] = {id, ...data}
+
+            this.#persist()
+        }
+    }
 }

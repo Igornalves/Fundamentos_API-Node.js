@@ -60,4 +60,20 @@ export const routes = [
             return res.writeHead(200).end('Hello Word !!!')
         }
     },
+    {
+        method: 'PUT',
+        path: buildRoutePath('/atualizandoUsers/:id'),
+        handler: (req,res) => {
+            const { id } = req.params
+
+            const { nome,email } = req.body
+
+            database.update('users', id, {
+                nome,
+                email
+            })
+
+            return res.writeHead(200).end('User Atualizando com sucesso !!!')
+        }
+    },
 ]
