@@ -3,7 +3,7 @@
 // Novo Padrao => ESModules => import/export  
 import http from 'node:http'
 import { json } from './middlewares/json.js'
-import { routes } from './routes.js'
+import { routes } from './routes/routes.js'
 
 // criando uma constante para cria o servidor
 // req = request => obtendo acesso as informacoes da requisicao ao server
@@ -28,15 +28,27 @@ const server = http.createServer(async (req, res) => {
 
     await json(req,res)
 
+    // chamando as rotas para conseguir fazer as requisicoes e respostas
     const route = routes.find(route => {
-        return route.method === method && route.path === url
+        return route.method === method && route.path.test(url)
     })
 
-    // console.log(route)
-
+    // como se fazia antes de ver a rota batia com a do path existente
+    // const route = routes.find(route => {
+    //     return route.method === method && route.path === url
+    // })
+    
     if(route) {
+        const routeParams = req.url.match(route.path)
+
+        req.params = { ...routeParams.groups }
+
+        // console.log(params)
+
         return route.handler(req,res)
     }
+
+    // console.log(route)
 
     return res.writeHead(404).end('Not Found')
 })
@@ -55,5 +67,7 @@ const server = http.createServer(async (req, res) => {
 
 // URL
 
-server.listen(3333)
+server.listen(3224, () => {
+    console.log('HTTP server running on port 3224 !!!')
+})
 // localhost:3333

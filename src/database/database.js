@@ -2,7 +2,7 @@
 import fs from 'node:fs/promises'
 
 // criando a constante para instanciar o locar de criacao do arquivo de persistencia de dados 
-const databasePath = new URL('../db.json', import.meta.url)
+const databasePath = new URL('./db.json', import.meta.url)
 
 export class Database {
     // Propriedade privada da class no JavaScript
@@ -40,5 +40,15 @@ export class Database {
         this.#persist()
 
         return data
+    }
+
+    delete(table, id) {
+        const rowIntex = this.#database[table].findIndex(row => row.id === id)
+
+        if (rowIntex > -1) {
+            this.#database[table].splice(rowIntex, 1)
+
+            this.#persist()
+        }
     }
 }
