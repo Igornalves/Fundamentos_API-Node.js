@@ -12,7 +12,15 @@ export const routes = [
         method: 'GET',
         path: buildRoutePath('/listandoUsers'),
         handler: (req,res) => {
-            const users = database.select('users')
+            const { search } = req.query
+            
+            const users = database.select('users', search ? {
+                nome: search,
+                email: search,
+            } : null)
+
+            console.log(req.query)
+
             // Early return
             return res.writeHead(200).end(JSON.stringify(users))
             // .setHeader('Content-type', 'application/json')

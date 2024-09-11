@@ -22,9 +22,23 @@ export class Database {
         fs.writeFile(databasePath, JSON.stringify(this.#database))
     }
 
+    // { nome: igor, email: igor }
+    // [['nome','igor'], ['email','igor08@gmail.com']]
+
     // metodo de selecao para pesquisa no banco de dados
-    select(table) {
-        const data = this.#database[table] ?? []
+    select(table, search) {
+        let data = this.#database[table] ?? []
+
+        // let it change
+
+        if (search) {
+            data = data.filter(row => {
+                return Object.entries(search).some(([key, value]) => {
+                    return row[key].toLowerCase().includes(value.toLowerCase())
+                })
+            })
+        }
+
         return data
     }
 
