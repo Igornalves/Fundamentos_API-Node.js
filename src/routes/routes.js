@@ -1,7 +1,7 @@
 import { Database } from '../database/database.js'
 import { randomUUID } from 'node:crypto'
 import { buildRoutePath } from '../utils/build-route-path.js'
-import path from 'node:path'
+import { swaggerDocument } from '../docs/swaggerDocs.js'
 
 // criando uma constante para instanciar o objeto database 
 const database = new Database()
@@ -44,7 +44,7 @@ export const routes = [
         method: 'DELETE',
         path: buildRoutePath('/deletandoUsers/:id'),
         handler: (req,res) => {
-            // console.log(req.params)
+            // console.log(req.params))
 
             const { id } = req.params 
 
@@ -73,15 +73,22 @@ export const routes = [
         path: buildRoutePath('/atualizandoUsers/:id'),
         handler: (req,res) => {
             const { id } = req.params
-
+            
             const { nome,email } = req.body
-
+            
             database.update('users', id, {
                 nome,
                 email
             })
-
+            
             return res.writeHead(200).end('User Atualizando com sucesso !!!')
         }
     },
+    {
+        method: 'GET',
+        path: buildRoutePath('/api-docs'),
+        handler: (req, res) => {
+            return res.writeHead(200, {'Content-Type': 'application/json'}).end(JSON.stringify(swaggerDocument))
+        }
+    },  
 ]
